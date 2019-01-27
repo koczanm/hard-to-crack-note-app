@@ -237,11 +237,11 @@ def add_note():
         body = request.form.get('body')
 
         if not validate_title(title):
-            flash('Invalid data')
+            flash('Invalid data', 'err')
             return redirect(url_for('add_note'))
 
         if not valitdate_body(body):
-            flash('Invalid data')
+            flash('Invalid data', 'err')
             return redirect(url_for('add_note'))
 
         if 'public' in request.form:
@@ -291,11 +291,11 @@ def edit_note(note_id):
         body = request.form.get('body')
 
         if not validate_title(title):
-            flash('Invalid data')
+            flash('Invalid data', 'err')
             return redirect(url_for('add_note'))
 
         if not valitdate_body(body):
-            flash('Invalid data')
+            flash('Invalid data', 'err')
             return redirect(url_for('add_note'))
 
         if 'public' in request.form:
@@ -328,4 +328,4 @@ def edit_note(note_id):
     users = note.users
     users.remove(author)
 
-    return render_template('node/edit.html', note=note, users=users)
+    return render_template('note/edit.html', note=note, users=users)

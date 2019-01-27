@@ -19,6 +19,8 @@ class User(db.Model):
     username = db.Column(db.String(32), unique=True, nullable=False)
     hashed_password = db.Column(db.String(256), nullable=False)
     authorized = db.Column(db.Boolean, default=False)
+    bad_attempts = db.Column(db.Integer, default=0)
+    date_blocking = db.Column(db.DateTime, default=datetime.utcnow)
     added_notes = db.relationship('Note', backref='user', lazy=True)
 
     def __init__(self, username, password):

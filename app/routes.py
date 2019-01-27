@@ -1,4 +1,4 @@
-import uuid
+from datetime import datetime, timedelta
 from functools import wraps
 
 from flask import (abort, flash, redirect, render_template, request, session,
@@ -7,13 +7,6 @@ from flask import (abort, flash, redirect, render_template, request, session,
 from app import app, db
 from app.models import Note, User
 from app.utils import validate_username, validate_password, validate_title, valitdate_body
-
-
-def generate_xsrf_token():
-    if '_xsrf_token' not in session:
-        session['_xsrf_token'] = uuid.uuid4().hex
-
-    return session['_xsrf_token']
 
 
 def signin_required(f):
@@ -81,11 +74,29 @@ def signin():
             flash('Invalid username or password', 'err')
             return redirect(url_for('signin'))
 
+        if user.date_blocking > datetime.utcnow():
+            flash('Temporarily blocked')
+            return redirect(url_for('signin'))
+
         if not user.check_password(password):
+            user.bad_attempts += 1
+
+            if user.bad_attempts == 5:
+                user.bad_attempts = 0
+                user.date_blocking = datetime.utcnow() + timedelta(minutes=5)
+
+                db.session.add(user)
+
+                try:
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+
             flash('Invalid username or password', 'err')
             return redirect(url_for('signin'))
 
         user.authorized = True
+        user.bad_attempts = 0
         db.session.add(user)
 
         try:
@@ -118,10 +129,6 @@ def signup():
 
         if not validate_password(password):
             flash('Password not allowed', 'err')
-            return redirect(url_for('signup'))
-
-        if not validate_password(password2):
-            flash('Different passwords', 'err')
             return redirect(url_for('signup'))
 
         if password != password2:
@@ -181,10 +188,6 @@ def account():
             return redirect(url_for('account'))
 
         if not validate_password(password):
-            flash('Password not allowed', 'err')
-            return redirect(url_for('account'))
-
-        if not validate_password(password2):
             flash('Password not allowed', 'err')
             return redirect(url_for('account'))
 

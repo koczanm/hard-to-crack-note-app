@@ -1,4 +1,14 @@
 import re
+import uuid
+
+from flask import session
+
+
+def generate_xsrf_token():
+    if '_xsrf_token' not in session:
+        session['_xsrf_token'] = uuid.uuid4().hex
+
+    return session['_xsrf_token']
 
 
 def validate_username(username):

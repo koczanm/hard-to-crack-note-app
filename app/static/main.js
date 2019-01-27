@@ -1,5 +1,6 @@
 $(document).ready(function() {
   let wrapper = $(".wrapper");
+  let passInfo = $(".pass-info");
   let addButton = $(".is-adding");
   let deleteButton = $(".delete");
   let navbarBurger = $(".navbar-burger");
@@ -26,8 +27,53 @@ $(document).ready(function() {
 
   $(passwordInput).keyup(function() {
     let password = $(this).val();
-    let entropy = 0;
-    for (let i = 0; i < password.length; i++) {
+
+    if (password.length < 8) {
+      msg = "Too short password";
+    } else if (password.length > 32) {
+      msg = "Too long password";
+    } else if (!/^[a-zA-Z0-9@$!%*?&]+$/.test(password)) {
+      msg = "Not allowed characters";
+    } else {
+      entropy = getEntropy(password);
+
+      if (entropy < 28) {
+        msg = "Very weak password";
+      } else if (entropy < 36) {
+        msg = "Weak password";
+      } else if (entropy < 60) {
+        msg = "Reasonable password";
+      } else if (entropy < 128) {
+        msg = "Strong password";
+      } else {
+        msg = "Very strong password";
+      }
     }
+
+    $(passInfo).text(msg);
   });
+
+  function getEntropy(password) {
+    if (/^[a-z]+$/.test(password) || /^[A-Z]+$/.test(password)) {
+      return password.length * Math.log2(26);
+    } else if (/^[0-9]+$/.test(password)) {
+      return password.length * Math.log2(10);
+    } else if (/^[@$!%*?&]+$/.test(password)) {
+      return password.length * Math.log2(7);
+    } else if (/^[a-zA-Z]+$/.test(password)) {
+      return password.length * Math.log2(52);
+    } else if (/^[a-z0-9]+$/.test(password) || /^[A-Z0-9]+$/.test(password)) {
+      return password.length * Math.log2(36);
+    } else if (/^[a-z@$!%*?&]+$/.test(password) || /^[A-Z@$!%*?&]+$/.test(password)) {
+      return password.length * Math.log2(33);
+    } else if (/^[a-zA-Z0-9]+$/.test(password)) {
+      return password.length * Math.log2(62);
+    } else if (/^[a-zA-Z@$!%*?&]+$/.test(password)) {
+      return password.length * Math.log2(59);
+    } else if (/^[a-z0-9@$!%*?&]+$/.test(password) || /^[A-Z0-9@$!%*?&]+$/.test(password)) {
+      return password.length * Math.log2(43);
+    } else {
+      return password.length * Math.log2(69);
+    }
+  }
 });

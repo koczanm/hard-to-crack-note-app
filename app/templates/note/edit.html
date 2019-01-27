@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<div class="navbar-start">
+  <a class="navbar-item" href="{{ url_for('dashboard') }}">
+    Dashboard
+  </a>
+  <a class="navbar-item" href="{{ url_for('notes') }}">
+    My Notes
+  </a>
+  <a class="navbar-item" href="{{ url_for('add_note') }}">
+    Add Note
+  </a>
+</div>
+<div class="navbar-end">
+  <a class="navbar-item" href="{{ url_for('account') }}">
+    Account
+  </a>
+  <a class="navbar-item" href="{{ url_for('signout') }}">
+    Sign Out
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="columns">
+  <div class="column is-6 is-offset-3">
+    {% with errs = get_flashed_messages(category_filter=['err']) %}
+    {% for err in errs %}
+    <div class="notification is-danger">
+      <button class="delete"></button>
+      {{ err }}
+    </div>
+    {% endfor %}
+    {% endwith %}
+    <div class="box">
+      {% if note %}
+      <form method="POST" enctype="multipart/form-data" action="{{ url_for('edit_note', note_id=note.id) }}">
+        <div class="field">
+          <label class="label">Title</label>
+          <div class="control">
+            <input class="input" type="text" name="title" value="{{ note.title }}">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Body</label>
+          <textarea class="textarea" name="body">{{ note.body }}</textarea>
+        </div>
+        <div class="field">
+          <label class="checkbox">
+            {% if note.public %}
+            <input type="checkbox" name="public" checked>
+            {% else %}
+            <input type="checkbox" name="public">
+            {% endif %}
+            Public
+          </label>
+        </div>
+        <div class="field wrapper">
+          <label class="label">Add User</label>
+          <div class="field is-grouped">
+            <div class="control">
+              <input class="input" type="text" name="user">
+            </div>
+            <div class="control">
+              <button class="button is-success is-adding">
+                Add More
+              </button>
+            </div>
+          </div>
+          {% for user in users %}
+          <div class="field is-grouped">
+            <div class="control">
+              <input class="input" type="text" name="user" value="{{ user.username }}">
+            </div>
+            <div class="control">
+              <button class="button is-danger is-removing">
+                Remove
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="field is-grouped">
+          <div class="control">
+            <input class="button is-success" type="submit" value="Save">
+          </div>
+          <div class="control">
+            <a class="button is-text" href="{{ url_for('dashboard') }}">Cancel</a>
+          </div>
+        </div>
+
+      </form>
+      {% else %}
+      <p>You don't have permission to access the note.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

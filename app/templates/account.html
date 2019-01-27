@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<div class="navbar-start">
+  <a class="navbar-item" href="{{ url_for('dashboard') }}">
+    Dashboard
+  </a>
+  <a class="navbar-item" href="{{ url_for('notes') }}">
+    My Notes
+  </a>
+  <a class="navbar-item" href="{{ url_for('add_note') }}">
+    Add Note
+  </a>
+</div>
+<div class="navbar-end">
+  <a class="navbar-item is-active" href="{{ url_for('account') }}">
+    Account
+  </a>
+  <a class="navbar-item" href="{{ url_for('signout') }}">
+    Sign Out
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="columns">
+  <div class="column is-4 is-offset-4">
+    {% with msgs = get_flashed_messages(category_filter=['msg']) %}
+    {% for msg in msgs %}
+    <div class="notification is-success">
+      <button class="delete"></button>
+      {{ msg }}
+    </div>
+    {% endfor %}
+    {% endwith %}
+    {% with errs = get_flashed_messages(category_filter=['err']) %}
+    {% for err in errs %}
+    <div class="notification is-danger">
+      <button class="delete"></button>
+      {{ err }}
+    </div>
+    {% endfor %}
+    {% endwith %}
+    <div class="box">
+      <form method="POST" enctype="multipart/form-data" action="{{ url_for('account') }}">
+        <div class="field">
+          <label class="label">Current Password</label>
+          <div class="control has-icons-left">
+            <input class="input" type="password" name="current_password">
+            <span class="icon is-small is-left">
+              <i class="fas fa-key"></i>
+            </span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">New Password</label>
+          <div class="control has-icons-left">
+            <input class="input" type="password" name="password">
+            <span class="icon is-small is-left">
+              <i class="fas fa-key"></i>
+            </span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Repeat New Password</label>
+          <div class="control has-icons-left">
+            <input class="input" type="password" name="password2">
+            <span class="icon is-small is-left">
+              <i class="fas fa-key"></i>
+            </span>
+          </div>
+        </div>
+        <input class="button is-success" type="submit" value="Save">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

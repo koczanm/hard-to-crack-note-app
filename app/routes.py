@@ -6,7 +6,7 @@ from flask import (abort, flash, redirect, render_template, request, session,
 
 from app import app, db
 from app.models import Note, User
-from app.utils import regex_validate_password, regex_validate_username
+from app.utils import validate_username, validate_password, validate_title, valitdate_body
 
 
 def generate_xsrf_token():
@@ -64,14 +64,14 @@ def index():
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username')
+        password = request.form.get('password')
 
-        if not regex_validate_username(username):
+        if not validate_username(username):
             flash('Invalid username or password', 'err')
             return redirect(url_for('signin'))
 
-        if not regex_validate_password(password):
+        if not validate_password(password):
             flash('Invalid username or password', 'err')
             return redirect(url_for('signin'))
 
@@ -102,11 +102,11 @@ def signin():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        password2 = request.form['password2']
+        username = request.form.get('username')
+        password = request.form.get('password')
+        password2 = request.form.get('password2')
 
-        if not regex_validate_username(username):
+        if not validate_username(username):
             flash('Username not allowed', 'err')
             return redirect(url_for('signup'))
 
@@ -116,8 +116,12 @@ def signup():
             flash('Username taken', 'err')
             return redirect(url_for('signup'))
 
-        if not regex_validate_password(password):
+        if not validate_password(password):
             flash('Password not allowed', 'err')
+            return redirect(url_for('signup'))
+
+        if not validate_password(password2):
+            flash('Different passwords', 'err')
             return redirect(url_for('signup'))
 
         if password != password2:
@@ -139,6 +143,7 @@ def signup():
 
 
 @app.route('/signout')
+@signin_required
 def signout():
     user_id = session['user_id']
     user = User.query.filter_by(id=user_id).first()
@@ -157,25 +162,167 @@ def signout():
 
 
 @app.route('/account', methods=['GET', 'POST'])
+@signin_required
 def account():
-    return 'OK'
+    if request.method == 'POST':
+        current_password = request.form.get('current_password')
+        password = request.form.get('password')
+        password2 = request.form.get('password2')
+
+        user_id = session['user_id']
+        user = User.query.filter_by(id=user_id).first()
+
+        if not validate_password(current_password):
+            flash('Invalid password', 'err')
+            return redirect(url_for('account'))
+
+        if not user.check_password(current_password):
+            flash('Invalid password', 'err')
+            return redirect(url_for('account'))
+
+        if not validate_password(password):
+            flash('Password not allowed', 'err')
+            return redirect(url_for('account'))
+
+        if not validate_password(password2):
+            flash('Password not allowed', 'err')
+            return redirect(url_for('account'))
+
+        if password != password2:
+            flash('Different passwords', 'err')
+            return redirect(url_for('account'))
+
+        user.set_password(password)
+        db.session.add(user)
+
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+
+        flash('Successfully changed', 'msg')
+        return redirect(url_for('account'))
+
+    return render_template('account.html')
 
 
 @app.route('/dashboard')
+@signin_required
 def dashboard():
-    return 'OK'
+    user_id = session['user_id']
+    pub_notes = Note.query.filter_by(public=True).all()
+    priv_notes = Note.query.filter_by(public=False).join(
+        Note.users).filter_by(id=user_id).all()
+
+    return render_template('dashboard.html', pub_notes=pub_notes, priv_notes=priv_notes)
 
 
 @app.route('/notes')
+@signin_required
 def notes():
-    return 'OK'
+    user_id = session['user_id']
+    user_notes = Note.query.filter_by(author_id=user_id).all()
+
+    return render_template('note/list.html', notes=user_notes)
 
 
 @app.route('/note/add', methods=['GET', 'POST'])
+@signin_required
 def add_note():
-    return 'OK'
+    if request.method == 'POST':
+        title = request.form.get('title')
+        body = request.form.get('body')
+
+        if not validate_title(title):
+            flash('Invalid data')
+            return redirect(url_for('add_note'))
+
+        if not valitdate_body(body):
+            flash('Invalid data')
+            return redirect(url_for('add_note'))
+
+        if 'public' in request.form:
+            public = True
+        else:
+            public = False
+
+        author_id = session['user_id']
+        author = User.query.filter_by(id=author_id).first()
+        users = request.form.getlist('user')
+
+        note = Note(title, body, public, author_id)
+        note.users.append(author)
+
+        for username in users:
+            if validate_username(username):
+                user = User.query.filter_by(username=username).first()
+
+                if user is not None:
+                    note.users.append(user)
+
+        db.session.add(note)
+
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+
+        return redirect(url_for('dashboard'))
+
+    return render_template('note/add.html')
 
 
 @app.route('/note/<int:note_id>', methods=['GET', 'POST'])
+@signin_required
 def edit_note(note_id):
-    return 'OK'
+    author_id = session['user_id']
+    author = User.query.filter_by(id=author_id).first()
+    note = Note.query.filter_by(id=note_id).filter_by(
+        author_id=author_id).first()
+
+    if note is None:
+        return render_template('note/edit.html')
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        body = request.form.get('body')
+
+        if not validate_title(title):
+            flash('Invalid data')
+            return redirect(url_for('add_note'))
+
+        if not valitdate_body(body):
+            flash('Invalid data')
+            return redirect(url_for('add_note'))
+
+        if 'public' in request.form:
+            public = True
+        else:
+            public = False
+
+        users = request.form.getlist('user')
+
+        edited_note = Note(title, body, public, author_id)
+        edited_note.users.append(author)
+
+        for username in users:
+            if validate_username(username):
+                user = User.query.filter_by(username=username).first()
+
+                if user is not None:
+                    edited_note.users.append(user)
+
+        db.session.delete(note)
+        db.session.add(edited_note)
+
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+
+        return redirect(url_for('notes'))
+
+    users = note.users
+    users.remove(author)
+
+    return render_template('node/edit.html', note=note, users=users)

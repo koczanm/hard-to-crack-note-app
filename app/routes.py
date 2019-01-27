@@ -61,20 +61,24 @@ def signin():
         password = request.form['password']
 
         if not regex_validate_username(username):
+            print("1")
             flash('Invalid username or password', 'err')
             return redirect(url_for('signin'))
 
         if not regex_validate_password(password):
+            print("2")
             flash('Invalid username or password', 'err')
             return redirect(url_for('signin'))
 
         user = User.query.filter_by(username=username).first()
 
         if user is None:
+            print("3")
             flash('Invalid username or password', 'err')
             return redirect(url_for('signin'))
 
         if not user.check_password(password):
+            print("4")
             flash('Invalid username or password', 'err')
             return redirect(url_for('signin'))
 

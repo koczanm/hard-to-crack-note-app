@@ -32,6 +32,7 @@
     {% endwith %}
     <div class="box">
       <form method="POST" enctype="multipart/form-data" action="{{ url_for('signin') }}">
+        <input type=hidden name="_xsrf_token" value="{{ xsrf_token() }}">
         <div class="field">
           <label class="label">Username</label>
           <div class="control has-icons-left">

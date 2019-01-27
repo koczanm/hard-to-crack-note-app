@@ -9,3 +9,5 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 
 from app import routes
+
+app.jinja_env.globals['xsrf_token'] = routes.generate_xsrf_token

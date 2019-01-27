@@ -14,24 +14,25 @@
 {% block content %}
 <div class="columns">
   <div class="column is-4 is-offset-4">
+    {% with msgs = get_flashed_messages(category_filter=['msg']) %}
+    {% for msg in msgs %}
+    <div class="notification is-success">
+      <button class="delete"></button>
+      {{ msg }}
+    </div>
+    {% endfor %}
+    {% endwith %}
+    {% with errs = get_flashed_messages(category_filter=['err']) %}
+    {% for err in errs %}
+    <div class="notification is-danger">
+      <button class="delete"></button>
+      {{ err }}
+    </div>
+    {% endfor %}
+    {% endwith %}
     <div class="box">
-      {% with msgs = get_flashed_messages(category_filter=['msg']) %}
-      {% for msg in msgs %}
-      <div class="notification is-success">
-        <button class="delete"></button>
-        {{ msg }}
-      </div>
-      {% endfor %}
-      {% endwith %}
-      {% with errs = get_flashed_messages(category_filter=['err']) %}
-      {% for err in errs %}
-      <div class="notification is-danger">
-        <button class="delete"></button>
-        {{ err }}
-      </div>
-      {% endfor %}
-      {% endwith %}
       <form method="POST" enctype="multipart/form-data" action="{{ url_for('signup') }}">
+        <input type=hidden name="_xsrf_token" value="{{ xsrf_token() }}">
         <div class="field">
           <label class="label">Username</label>
           <div class="control has-icons-left">

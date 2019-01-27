@@ -40,6 +40,13 @@ def signin_required(f):
 
 
 @app.before_request
+def before_request():
+    if not request.is_secure:
+        url = request.url.replace("http://", "https://", 1)
+        return redirect(url, code=301)
+
+
+@app.before_request
 def xsrf_protect():
     if request.method == 'POST':
         token = session.pop('_xsrf_token', None)

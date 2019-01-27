@@ -23,7 +23,7 @@ def validate_title(title):
 
 
 def valitdate_body(body):
-    if body is not None and len(body) > 0 and len(title) < 128:
+    if body is not None and len(body) > 0 and len(body) < 128:
         return True
 
     return False

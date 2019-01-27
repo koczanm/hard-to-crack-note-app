@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<div class="navbar-start">
+  <a class="navbar-item is-active" href="{{ url_for('dashboard') }}">
+    Dashboard
+  </a>
+  <a class="navbar-item" href="{{ url_for('notes') }}">
+    My Notes
+  </a>
+  <a class="navbar-item" href="{{ url_for('add_note') }}">
+    Add Note
+  </a>
+</div>
+<div class="navbar-end">
+  <a class="navbar-item" href="{{ url_for('account') }}">
+    Account
+  </a>
+  <a class="navbar-item" href="{{ url_for('signout') }}">
+    Sign Out
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="columns">
+  <div class="column">
+    <p class="title is-3">Public</p>
+    {% for note in pub_notes %}
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">
+          {{ note.title }}
+        </p>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          {{ note.body }}
+        </div>
+        {% set datetime = note.pub_date.strftime('%Y-%m-%d') %}
+        {% set full_datetime = note.pub_date.strftime('%b %d %Y %H:%M:%S') %}
+        <time datetime="{{ date_time }}">{{ full_datetime }}</time>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="column">
+    <p class="title is-3">Private</p>
+    {% for note in priv_notes %}
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">
+          {{ note.title }}
+        </p>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          {{ note.body }}
+        </div>
+        {% set datetime = note.pub_date.strftime('%Y-%m-%d') %}
+        {% set full_datetime = note.pub_date.strftime('%b %d %Y %H:%M:%S') %}
+        <time datetime="{{ date_time }}">{{ full_datetime }}</time>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

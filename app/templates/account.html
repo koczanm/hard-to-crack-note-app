@@ -43,6 +43,7 @@
     {% endwith %}
     <div class="box">
       <form method="POST" enctype="multipart/form-data" action="{{ url_for('account') }}">
+        <input type=hidden name="_xsrf_token" value="{{ xsrf_token() }}">
         <div class="field">
           <label class="label">Current Password</label>
           <div class="control has-icons-left">

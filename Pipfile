@@ -12,7 +12,6 @@ flask = "*"
 gunicorn = "*"
 flask-sqlalchemy = "*"
 passlib = "*"
-psycopg2 = "*"
 
 [requires]
 python_version = "3.5"

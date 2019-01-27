@@ -28,7 +28,7 @@ $(document).ready(function() {
   $(passwordInput).keyup(function() {
     let password = $(this).val();
 
-    if (password.length < 8) {
+    if (password.length < 4) {
       msg = "Too short password";
     } else if (password.length > 32) {
       msg = "Too long password";

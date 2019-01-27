@@ -19,7 +19,7 @@ def validate_username(username):
 
 
 def validate_password(password):
-    if password is not None and re.match(r'^[a-zA-Z0-9@$!%*?&]{8,32}$', password):
+    if password is not None and re.match(r'^[a-zA-Z0-9@$!%*?&]{4,32}$', password):
         return True
 
     return False

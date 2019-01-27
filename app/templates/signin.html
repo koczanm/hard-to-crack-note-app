@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<div class="navbar-end">
+  <a class="navbar-item is-active" href="{{ url_for('signin') }}">
+    Sign In
+  </a>
+  <a class="navbar-item" href="{{ url_for('signup') }}">
+    Sign Up
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="columns">
+  <div class="column is-4 is-offset-4">
+    {% with msgs = get_flashed_messages(category_filter=['msg']) %}
+    {% for msg in msgs %}
+    <div class="notification is-success">
+      <button class="delete"></button>
+      {{ msg }}
+    </div>
+    {% endfor %}
+    {% endwith %}
+    {% with errs = get_flashed_messages(category_filter=['err']) %}
+    {% for err in errs %}
+    <div class="notification is-danger">
+      <button class="delete"></button>
+      {{ err }}
+    </div>
+    {% endfor %}
+    {% endwith %}
+    <div class="box">
+      <form method="POST" enctype="multipart/form-data" action="{{ url_for('signin') }}">
+        <div class="field">
+          <label class="label">Username</label>
+          <div class="control has-icons-left">
+            <input class="input" type="text" name="username" maxlength="16">
+            <span class="icon is-small is-left">
+              <i class="fas fa-user"></i>
+            </span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Password</label>
+          <div class="control has-icons-left">
+            <input class="input" type="password" name="password" maxlength="32">
+            <span class="icon is-small is-left">
+              <i class="fas fa-key"></i>
+            </span>
+          </div>
+        </div>
+        <input class="button is-success" type="submit" value="Sign In">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -81,18 +81,16 @@ def signin():
         if not user.check_password(password):
             user.bad_attempts += 1
 
-            print(user.bad_attempts)
-
             if user.bad_attempts == 5:
                 user.bad_attempts = 0
                 user.date_blocking = datetime.utcnow() + timedelta(minutes=5)
+       
+            db.session.add(user)
 
-                db.session.add(user)
-
-                try:
-                    db.session.commit()
-                except:
-                    db.session.rollback()
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
 
             flash('Invalid username or password', 'err')
             return redirect(url_for('signin'))

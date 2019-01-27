@@ -7,7 +7,5 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 db = SQLAlchemy(app)
-db.drop_all()
-db.create_all()
 
 from app import routes

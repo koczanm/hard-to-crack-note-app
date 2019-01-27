@@ -81,6 +81,8 @@ def signin():
         if not user.check_password(password):
             user.bad_attempts += 1
 
+            print(user.bad_attempts)
+
             if user.bad_attempts == 5:
                 user.bad_attempts = 0
                 user.date_blocking = datetime.utcnow() + timedelta(minutes=5)

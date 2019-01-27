@@ -16,8 +16,8 @@ shared_notes = db.Table('shared_notes',
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(16), unique=True, nullable=False)
-    hashed_password = db.Column(db.String(128), nullable=False)
+    username = db.Column(db.String(32), unique=True, nullable=False)
+    hashed_password = db.Column(db.String(256), nullable=False)
     authorized = db.Column(db.Boolean, default=False)
     added_notes = db.relationship('Note', backref='user', lazy=True)
 
@@ -39,8 +39,8 @@ class User(db.Model):
 
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(32), nullable=False)
-    body = db.Column(db.String(128), nullable=False)
+    title = db.Column(db.String(64), nullable=False)
+    body = db.Column(db.String(256), nullable=False)
     public = db.Column(db.Boolean, nullable=False)
     pub_date = db.Column(db.DateTime, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))

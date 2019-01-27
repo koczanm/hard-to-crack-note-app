@@ -34,7 +34,7 @@
     {% endfor %}
     {% endwith %}
     <div class="box">
-      <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_note') }}">
+      <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_note') }}" autocomplete="off">
         <input type=hidden name="_xsrf_token" value="{{ xsrf_token() }}">
         <div class="field">
           <label class="label">Title</label>
